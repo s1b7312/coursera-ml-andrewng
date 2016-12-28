@@ -62,23 +62,30 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+a1 = [ones(m, 1) X];                % add bias  - 5000 x 401
+                                    % Theta1 - 25 x 401
+z2 = a1 * Theta1';                  % 5000 x 25'
 
+a2 = [ones(m, 1) sigmoid(z2)];      % take sigmoid and add bias - 5000 x 26
+                                    % Theta2 - 10 x 26
+z3 = a2 * Theta2';                  % 5000 x 10'
+a3 = h = sigmoid(z3);               % 5000 x 10
+k = num_labels;                     % output labels
 
+% we need to recode the output labels as 1-hot encoding
+y1 = zeros(m, k);                   % 5000 x 10
+for i = 1:k
+    y1(:, i) = y == i;              % set i_th column
+end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+J = 0;
+%J = sum(sum(y1 .* log(h) + (1 - y1) .* log(1 - h)));
+for i = 1:m
+    for j = 1:k
+        J += y1(i,j) * log(h(i,j)) + (1-y1(i,j)) * log(1 - h(i,j));
+    end
+end
+J = -J/m;
 
 % -------------------------------------------------------------
 
