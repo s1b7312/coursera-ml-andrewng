@@ -64,11 +64,11 @@ Theta2_grad = zeros(size(Theta2));
 
 a1 = [ones(m, 1) X];                % add bias  - 5000 x 401
                                     % Theta1 - 25 x 401
-z2 = a1 * Theta1';                  % 5000 x 25'
+z2 = a1 * Theta1';                  % 5000 x 25
 
 a2 = [ones(m, 1) sigmoid(z2)];      % take sigmoid and add bias - 5000 x 26
                                     % Theta2 - 10 x 26
-z3 = a2 * Theta2';                  % 5000 x 10'
+z3 = a2 * Theta2';                  % 5000 x 10
 a3 = h = sigmoid(z3);               % 5000 x 10
 k = num_labels;                     % output labels
 
@@ -79,7 +79,7 @@ for i = 1:k
 end
 
 J = 0;
-%J = sum(sum(y1 .* log(h) + (1 - y1) .* log(1 - h)));
+% J = sum(sum(y1 .* log(h) + (1 - y1) .* log(1 - h)));
 for i = 1:m
     for j = 1:k
         J += y1(i,j) * log(h(i,j)) + (1-y1(i,j)) * log(1 - h(i,j));
@@ -87,11 +87,23 @@ for i = 1:m
 end
 J = -J/m;
 
-% exclude bias weights
+% regularization excluding bias weights
 penalty = (lambda/(2*m)) * (sum(sum(Theta1(:, 2:end) .^ 2)) + sum(sum(Theta2(:, 2:end) .^ 2)));
 J += penalty;
 
 % -------------------------------------------------------------
+
+error3 = h - y1;                    % 5000 x 10
+error2 = error3 * Theta2(:, 2:end) .* sigmoidGradient(z2);    % 5000 x 25
+
+delta1 = error2' * a1;
+delta2 = error3' * a2;
+
+Theta1_grad = delta1/m;
+Theta2_grad = delta2/m;
+
+Theta1_grad += (lambda/m) * [zeros(hidden_layer_size,1) Theta1(:, 2:end)];
+Theta2_grad += (lambda/m) * [zeros(num_labels,1) Theta2(:, 2:end)];
 
 % =========================================================================
 
